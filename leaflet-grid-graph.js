@@ -236,6 +236,8 @@ var lg =  {
                 .append("g")
                 .attr("transform", "translate(" + this._properties.margin.left + "," + this._properties.margin.top + ")");
 
+            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return d3.format('0,000')(d.value); });    
+
             valuesList.forEach(function(v,i){
             	var g = _grid.append("g").attr('class','bars');
             		
@@ -251,15 +253,25 @@ var lg =  {
             		return a[_parent._nameAttr].localeCompare(b[_parent._nameAttr]);
 				});
 
+                var newData = [];
+
+                data.forEach(function(d,i){
+                    var nd = {};
+                    nd.pos = d.pos;
+                    nd.join = d[_parent._joinAttr];
+                    nd.value = d[v];
+                    newData.push(nd);
+                });
+
             	g.selectAll("rect")
-	                .data(data)
+	                .data(newData)
 	                .enter()
 	                .append("rect")
-	                .attr('class','bars'+v)
+	                .attr('class','bars'+i)
 	                .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
 	                .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
 	                .attr("width", function(d){
-	                    return _parent._properties.x[i](d[v]);
+	                    return _parent._properties.x[i](d.value);
 	                })
 	                .attr("height", _parent._properties.boxHeight)
 	                .attr("fill",function(d,i2){
@@ -318,15 +330,15 @@ var lg =  {
 		            .attr("opacity",0)
 		            .attr("class",function(d){return "maxLabel"+i})
 		            .attr("stroke-width", 1)
-	                .attr("stroke", "#ddd");
+	                .attr("stroke", "#ddd");                   
 
 				var g = _grid.append("g");
 
-            	g.selectAll("rect")
-	                .data(data)
+            	var selectBars = g.selectAll("rect")
+	                .data(newData)
 	                .enter()
 	                .append("rect")
-	                .attr('class','selectbars'+v)
+	                .attr('class','selectbars'+i)
 	                .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
 	                .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
 	                .attr("width", function(d){
@@ -334,22 +346,31 @@ var lg =  {
 	                })
 	                .attr("height", _parent._properties.boxHeight+_parent._vWhiteSpace)
 	                .attr("opacity",0)
-	                .on("mouseover",function(d,i2){
-	                	var dataSubset = [];
-	                	data.forEach(function(d){
-	                		dataSubset.push({'key':d[joinAttr],'value':d[v]});
-	                	});
+	                
+                d3.selectAll('.selectbars'+i).call(tip);
 
-	                	lg.mapRegister.colorMap(dataSubset);
-	                	d3.selectAll('.dashgeom'+d[joinAttr]).attr("stroke-width",3);
-	                	d3.selectAll('.maxLabel'+i).attr("opacity",1);
-	                	d3.selectAll('.horLine'+i2).attr("opacity",1);
-	                })
-	                .on("mouseout",function(d,i2){
-	                	d3.selectAll('.maxLabel'+i).attr("opacity",0);
-	                	d3.selectAll('.horLine'+i2).attr("opacity",0);
-	                	d3.selectAll('.dashgeom'+d[joinAttr]).attr("stroke-width",1);	                	
-	                });	                  	                               
+                selectBars.on("mouseover",function(d,i2){
+
+                        var dataSubset = [];
+                        newData.forEach(function(d){
+                            dataSubset.push({'key':d.join,'value':d.value});
+                        });
+
+                        lg.mapRegister.colorMap(dataSubset);
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);
+                        d3.selectAll('.maxLabel'+i).attr("opacity",1);
+                        d3.selectAll('.horLine'+i2).attr("opacity",1);
+
+                    })
+                    .on("mouseout",function(d,i2){
+
+                        d3.selectAll('.maxLabel'+i).attr("opacity",0);
+                        d3.selectAll('.horLine'+i2).attr("opacity",0);
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);                        
+                    });
+
+                d3.selectAll('.selectbars'+i).on('mouseover.something', tip.show).on('mouseout.something', tip.hide);         
+   	                  	                               
             })
 			
 			var g = _grid.append("g");
@@ -417,13 +438,26 @@ var lg =  {
 			});
 
 			valuesList.forEach(function(v,i){
-				d3.selectAll(".bars"+v)					
+
+                var newData = [];
+
+                data.forEach(function(d,i){
+                    var nd = {};
+                    nd.pos = d.pos;
+                    nd.join = d[_parent._joinAttr];
+                    nd.value = d[v];
+                    newData.push(nd);
+                });
+
+				d3.selectAll(".bars"+i)
+                    .data(newData)					
 					.transition()
 					.duration(750)
 					.attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
 		            .attr("y", function(d,i2){return _parent._properties.boxHeight*d.pos+d.pos*_parent._vWhiteSpace});
 
-				d3.selectAll(".selectbars"+v)					
+				d3.selectAll(".selectbars"+i)
+                    .data(newData) 					
 					.transition()
 					.duration(750)
 					.attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
@@ -449,3 +483,5 @@ var lg =  {
         }        
     }	
 }
+
+d3.tip=function(){function t(t){v=d(t),w=v.createSVGPoint(),document.body.appendChild(g)}function e(){return"n"}function n(){return[0,0]}function r(){return" "}function o(){var t=y();return{top:t.n.y-g.offsetHeight,left:t.n.x-g.offsetWidth/2}}function s(){var t=y();return{top:t.s.y,left:t.s.x-g.offsetWidth/2}}function u(){var t=y();return{top:t.e.y-g.offsetHeight/2,left:t.e.x}}function f(){var t=y();return{top:t.w.y-g.offsetHeight/2,left:t.w.x-g.offsetWidth}}function l(){var t=y();return{top:t.nw.y-g.offsetHeight,left:t.nw.x-g.offsetWidth}}function i(){var t=y();return{top:t.ne.y-g.offsetHeight,left:t.ne.x}}function a(){var t=y();return{top:t.sw.y,left:t.sw.x-g.offsetWidth}}function c(){var t=y();return{top:t.se.y,left:t.e.x}}function m(){var t=document.createElement("div");return t.style.position="absolute",t.style.display="none",t.style.boxSizing="border-box",t}function d(t){return t=t.node(),"svg"==t.tagName.toLowerCase()?t:t.ownerSVGElement}function y(){var t=d3.event.target,e={},n=t.getScreenCTM(),r=t.getBBox(),o=r.width,s=r.height,u=r.x,f=r.y,l=document.body.scrollTop,i=document.body.scrollLeft;return document.documentElement&&document.documentElement.scrollTop&&(l=document.documentElement.scrollTop,i=document.documentElement.scrollLeft),w.x=u+i,w.y=f+l,e.nw=w.matrixTransform(n),w.x+=o,e.ne=w.matrixTransform(n),w.y+=s,e.se=w.matrixTransform(n),w.x-=o,e.sw=w.matrixTransform(n),w.y-=s/2,e.w=w.matrixTransform(n),w.x+=o,e.e=w.matrixTransform(n),w.x-=o/2,w.y-=s/2,e.n=w.matrixTransform(n),w.y+=s,e.s=w.matrixTransform(n),e}var p=e,h=n,x=r,g=m(),v=null,w=null;t.show=function(){var e,n=x.apply(this,arguments),r=h.apply(this,arguments),o=p.apply(this,arguments),s=d3.select(g),u=0;for(s.html(n).style("display","block");u--;)s.classed(b[u],!1);return e=T.get(o).apply(this),s.classed(o,!0).style({top:e.top+r[0]+"px",left:e.left+r[1]+"px"}),t},t.hide=function(){return g.style.display="none",g.innerHTML="",t},t.attr=function(e,n){return arguments.length<2?d3.select(g).attr(e):(d3.select(g).attr(e,n),t)},t.style=function(e,n){return arguments.length<2?d3.select(g).style(e):(d3.select(g).style(e,n),t)},t.direction=function(e){return arguments.length?(p=null==e?e:d3.functor(e),t):p},t.offset=function(e){return arguments.length?(h=null==e?e:d3.functor(e),t):h},t.html=function(e){return arguments.length?(x=null==e?e:d3.functor(e),t):x};var T=d3.map({n:o,s:s,e:u,w:f,nw:l,ne:i,sw:a,se:c}),b=T.keys();return t};
