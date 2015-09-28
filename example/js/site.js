@@ -4,8 +4,11 @@ function generateDashboard(data,geom){
     var grid = new lg.grid('#grid')
         .data(data)
         .width($('#grid').width())
+        .height(500)
         .nameAttr('NAME')
-        .joinAttr('NAME')
+        .joinAttr('ID')
+        .hWhiteSpace(5)
+        .vWhiteSpace(10)
         .valuesList(['VULNERABILITY','HAZARDS','COPINGCAPACITY','INFORM','REFUGEES','FUNDED','COMMITTED']);
 
     lg.init();
