@@ -1,7 +1,8 @@
 [
   {
     "YEAR":2015,
-    "NAME":"BRN",
+    "ID":"BRN",
+    "NAME":"Burundi",
     "PIN":0,
     "TAR":0,
     "COMMITTED":307000000,
@@ -22,7 +23,8 @@
   
   {
     "YEAR":2015,
-    "NAME":"DJI",
+    "ID":"DJI",
+    "NAME":"Djibouti",
     "PIN":140000,
     "TAR":250000,
     "COMMITTED":82000000,
@@ -42,7 +44,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"ERI",
+    "ID":"ERI",
+    "NAME":"Eritrea",
     "PIN":900000,
     "TAR":900000,
     "COMMITTED":0,
@@ -62,7 +65,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"ETH",
+    "ID":"ETH",
+    "NAME":"Ethiopia",
     "PIN":2900000,
     "TAR":2900000,
     "COMMITTED":344922157,
@@ -82,7 +86,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"KEN",
+    "ID":"KEN",
+    "NAME":"Kenya",
     "PIN":1500000,
     "TAR":1500000,
     "COMMITTED":0,
@@ -102,7 +107,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"SDN",
+    "ID":"SDN",
+    "NAME":"Sudan",
     "PIN":6100000,
     "TAR":5400000,
     "COMMITTED":1035894093,
@@ -122,7 +128,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"SOM",
+    "ID":"SOM",
+    "NAME":"Somalia",
     "PIN":3200000,
     "TAR":2760000,
     "COMMITTED":862579628,
@@ -142,7 +149,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"SSD",
+    "ID":"SSD",
+    "NAME":"South Sudan",
     "PIN":6400000,
     "TAR":551000,
     "COMMITTED":1630000000,
@@ -162,7 +170,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"UGA",
+    "ID":"UGA",
+    "NAME":"Uganda",
     "PIN":23000,
     "TAR":23000,
     "COMMITTED":0,
@@ -182,7 +191,8 @@
   },
   {
     "YEAR":2015,
-    "NAME":"RWA",
+    "ID":"RWA",
+    "NAME":"Rwanda",
     "PIN":0,
     "TAR":0,
     "COMMITTED":0,
