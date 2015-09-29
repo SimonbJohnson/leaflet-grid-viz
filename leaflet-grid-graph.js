@@ -3,6 +3,7 @@ var lg =  {
 	mapRegister:'',
 	_gridRegister:'',
 	_colors:['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'],
+    _selectedBar:-1,
 
 	init: function(){
 		this.mapRegister.init();
@@ -356,18 +357,37 @@ var lg =  {
                             dataSubset.push({'key':d.join,'value':d.value});
                         });
 
-                        lg.mapRegister.colorMap(dataSubset);
-                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);
-                        d3.selectAll('.maxLabel'+i).attr("opacity",1);
+                        
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);                        
                         d3.selectAll('.horLine'+i2).attr("opacity",1);
+
+                        if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel'+i).attr("opacity",1);
+                            lg.mapRegister.colorMap(dataSubset);
+                        }
 
                     })
                     .on("mouseout",function(d,i2){
 
-                        d3.selectAll('.maxLabel'+i).attr("opacity",0);
+
                         d3.selectAll('.horLine'+i2).attr("opacity",0);
-                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);                        
-                    });
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);
+
+                        if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
+                        }                        
+                    })
+                    .on('click',function(d,i2){
+                        if(lg._selectedBar ==i){
+                            lg._selectedBar = -1;
+                            console.log('reset');
+                        } else {
+                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",0);                          
+                            lg._selectedBar = i;
+                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
+                            console.log(i);
+                        };
+                    })
 
                 d3.selectAll('.selectbars'+i).on('mouseover.something', tip.show).on('mouseout.something', tip.hide);         
    	                  	                               
