@@ -72,12 +72,14 @@ var lg =  {
         };
 
         this._style = function(feature){
+            console.log(lg.mapRegister._joinAttr);
+            console.log(feature.properties[lg.mapRegister._joinAttr]);
             return {
                 weight: 1,
                 opacity: 0.8,
                 color:'#000000',
                 fillOpacity: 0,
-                className: 'dashgeom dashgeom'+feature[lg.mapRegister._joinAttr]
+                className: 'dashgeom dashgeom'+feature.properties[lg.mapRegister._joinAttr]
             };
         };        
 
@@ -105,7 +107,6 @@ var lg =  {
         }
 
         this.colorMap = function (data){
-
         	var _parent = this;
 
         	data.sort(function(a, b) {
@@ -131,7 +132,7 @@ var lg =  {
     	this._properties = {};
     	this._vWhiteSpace = 1;
     	this._hWhiteSpace = 1;
-
+        this._properties.margin = {top: 120, right: 50, bottom: 20, left: 120};
     	lg._gridRegister = this;
 
     	this.width = function(val){
@@ -160,6 +161,15 @@ var lg =  {
                 return this;
             }        
         };
+
+        this.margins = function(val){
+            if(typeof val === 'undefined'){
+                return this._properties.margin;
+            } else {
+                this._properties.margin=val;
+                return this;
+            }        
+        };        
 
 		this.nameAttr = function(val){
             if(typeof val === 'undefined'){
@@ -218,7 +228,7 @@ var lg =  {
 
         	var _parent = this;
 
-			this._properties.margin = {top: 120, right: 50, bottom: 20, left: 120};
+			//this._properties.margin = {top: 120, right: 50, bottom: 20, left: 120};
             this._properties.width = this._width - this._properties.margin.left - this._properties.margin.right;
             this._properties.height = this._height - this._properties.margin.top - this._properties.margin.bottom;
 
@@ -226,7 +236,7 @@ var lg =  {
             this._properties.boxHeight = this._properties.height/data.length-this._vWhiteSpace;      
             this._properties.x = [];
             valuesList.forEach(function(v,i){
-				_parent._properties.x[i] = d3.scale.linear().range([0, _parent._properties.boxWidth]).domain([0, d3.max(data,function(d){return d[v];})]);             	
+				_parent._properties.x[i] = d3.scale.linear().range([0, _parent._properties.boxWidth]).domain([0, d3.max(data,function(d){return Number(d[v]);})]);             	
             });
 
             var _grid = d3.select(id)
@@ -296,7 +306,7 @@ var lg =  {
 		            });
 
 		        g.append("text")
-		            .text(d3.format(".4s")(d3.max(data,function(d){return d[v];})))        
+		            .text(d3.format(".4s")(d3.max(data,function(d){return Number(d[v]);})))        
 	                .attr("x",_parent._properties.boxWidth-5)
 	                .attr("y",_parent._properties.height+_parent._vWhiteSpace)               
 	                .style("text-anchor", "front")
