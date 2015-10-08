@@ -72,8 +72,6 @@ var lg =  {
         };
 
         this._style = function(feature){
-            console.log(lg.mapRegister._joinAttr);
-            console.log(feature.properties[lg.mapRegister._joinAttr]);
             return {
                 weight: 1,
                 opacity: 0.8,
@@ -247,7 +245,8 @@ var lg =  {
                 .append("g")
                 .attr("transform", "translate(" + this._properties.margin.left + "," + this._properties.margin.top + ")");
 
-            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return d3.format('0,000')(d.value); });    
+            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return d3.format('0,000')(d.value); });
+            var tipsort = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return "Click to sort"});     
 
             valuesList.forEach(function(v,i){
             	var g = _grid.append("g").attr('class','bars');
@@ -304,6 +303,8 @@ var lg =  {
 		            .on("click",function(){
 		            	_parent._update(data,valuesList,d3.select(this).text(),nameAttr);
 		            });
+
+                d3.selectAll('.sortLabel').call(tipsort);
 
 		        g.append("text")
 		            .text(d3.format(".4s")(d3.max(data,function(d){return Number(d[v]);})))        
@@ -390,16 +391,15 @@ var lg =  {
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
                             lg._selectedBar = -1;
-                            console.log('reset');
                         } else {
                             d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",0);                          
                             lg._selectedBar = i;
                             d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
-                            console.log(i);
                         };
                     })
 
-                d3.selectAll('.selectbars'+i).on('mouseover.something', tip.show).on('mouseout.something', tip.hide);         
+                d3.selectAll('.selectbars'+i).on('mouseover.something', tip.show).on('mouseout.something', tip.hide);
+                d3.selectAll('.sortLabel').on('mouseover.something', tipsort.show).on('mouseout.something', tipsort.hide);         
    	                  	                               
             })
 			
