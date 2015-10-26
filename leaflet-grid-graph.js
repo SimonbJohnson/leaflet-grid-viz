@@ -245,13 +245,26 @@ var lg =  {
                 .append("g")
                 .attr("transform", "translate(" + this._properties.margin.left + "," + this._properties.margin.top + ")");
 
-            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return d3.format('0,000')(d.value); });
+            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {
+                if(isNaN(d.value) || d.value==null){
+                    return d.value;
+                } else {                    
+                    return d3.format('0,000')(d.value);
+                }
+            });
+
             var tipsort = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return "Click to sort"});     
 
             valuesList.forEach(function(v,i){
             	var g = _grid.append("g").attr('class','bars');
             		
             	data.sort(function(a, b) {
+                    if(a[v]==null || isNaN(a[v])){
+                        return -1;
+                    }
+                    if(b[v]==null || isNaN(b[v])){
+                        return 1;
+                    }                    
     				return parseFloat(a[v]) - parseFloat(b[v]);
 				});
 
@@ -281,10 +294,16 @@ var lg =  {
 	                .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
 	                .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
 	                .attr("width", function(d){
+                        if(d.value==null||isNaN(d.value)){
+                            return _parent._properties.boxWidth;
+                        }
 	                    return _parent._properties.x[i](d.value);
 	                })
 	                .attr("height", _parent._properties.boxHeight)
 	                .attr("fill",function(d,i2){
+                        if(d.value==null||isNaN(d.value)){
+                            return '#cccccc';
+                        }                        
 	                	var c = Math.floor(d.pos/data.length*5);
 	                	return lg._colors[c];
 	                });	                
@@ -456,8 +475,14 @@ var lg =  {
         	var _parent = this;
 
         	data.sort(function(a, b) {
-    			return parseFloat(b[sortBy]) - parseFloat(a[sortBy]);
-			});
+                    if(a[sortBy]==null || isNaN(a[sortBy])){
+                        return 1;
+                    }
+                    if(b[sortBy]==null || isNaN(b[sortBy])){
+                        return -1;
+                    }                    
+                    return parseFloat(b[sortBy])-parseFloat(a[sortBy]);
+                });
 
 	        data.forEach(function(d,i){
 	          	d.pos = i;
