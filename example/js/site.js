@@ -9,7 +9,7 @@ function generateDashboard(data,geom){
         .joinAttr('ID')
         .hWhiteSpace(5)
         .vWhiteSpace(10)
-        .valuesList(['VULNERABILITY','HAZARDS','COPINGCAPACITY','INFORM','REFUGEES','FUNDED','COMMITTED']);
+        .columns(['VULNERABILITY','HAZARDS','COPINGCAPACITY','INFORM','REFUGEES','FUNDED','COMMITTED']);
 
     lg.init();
 }
