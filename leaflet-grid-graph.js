@@ -109,10 +109,10 @@ var lg =  {
 
         	data.sort(function(a, b) {
 
-                if(a.value==null || isNaN(a.value) || a.value==''){
+                if(a.value==null || isNaN(a.value) || a.value===''){
                     return -1;
                 }
-                if(b.value==null || isNaN(b.value) || b.value==''){
+                if(b.value==null || isNaN(b.value) || b.value===''){
                     return 1;
                 }                    
     			return parseFloat(a.value) - parseFloat(b.value);
@@ -120,7 +120,7 @@ var lg =  {
 
 
         	data.forEach(function(d,i){
-                if(d.value==null||isNaN(d.value)||d.value==''){
+                if(d.value==null||isNaN(d.value)||d.value===''){
                     d3.selectAll('.dashgeom'+d.key).attr('fill','#cccccc').attr('fill-opacity',0.8);
                 } else {                        
             		var c = Math.floor(i/data.length*5);
@@ -262,7 +262,7 @@ var lg =  {
                 .attr("transform", "translate(" + this._properties.margin.left + "," + this._properties.margin.top + ")");
 
             var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {
-                if(isNaN(d.value) || d.value==null || d.value==''){
+                if(isNaN(d.value) || d.value==null || d.value===''){
                     return d.value;
                 } else {                    
                     return d3.format('0,000')(d.value);
@@ -275,10 +275,10 @@ var lg =  {
             	var g = _grid.append("g").attr('class','bars');
             		
             	data.sort(function(a, b) {
-                    if(a[v]==null || isNaN(a[v]) || a[v]==''){
+                    if(a[v]==null || isNaN(a[v]) || a[v]===''){
                         return -1;
                     }
-                    if(b[v]==null || isNaN(b[v]) || b[v]==''){
+                    if(b[v]==null || isNaN(b[v]) || b[v]===''){
                         return 1;
                     }                    
     				return parseFloat(a[v]) - parseFloat(b[v]);
@@ -310,14 +310,14 @@ var lg =  {
 	                .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
 	                .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
 	                .attr("width", function(d){
-                        if(d.value==null||isNaN(d.value) || d.value==''){
+                        if(d.value==null||isNaN(d.value) || d.value===''){
                             return _parent._properties.boxWidth;
                         }
 	                    return _parent._properties.x[i](d.value);
 	                })
 	                .attr("height", _parent._properties.boxHeight)
 	                .attr("fill",function(d,i2){
-                        if(d.value==null||isNaN(d.value) || d.value==''){
+                        if(d.value==null||isNaN(d.value) || d.value===''){
                             return '#cccccc';
                         }                        
 	                	var c = Math.floor(d.pos/data.length*5);
@@ -490,10 +490,10 @@ var lg =  {
 
         	var _parent = this;
         	data.sort(function(a, b) {
-                    if(a[sortBy]==null || isNaN(a[sortBy]) || a[sortBy]==''){
+                    if(a[sortBy]==null || isNaN(a[sortBy]) || a[sortBy]===''){
                         return 1;
                     }
-                    if(b[sortBy]==null || isNaN(b[sortBy]) || b[sortBy]==''){
+                    if(b[sortBy]==null || isNaN(b[sortBy]) || b[sortBy]===''){
                         return -1;
                     }                    
                     return parseFloat(b[sortBy])-parseFloat(a[sortBy]);
