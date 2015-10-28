@@ -1,5 +1,8 @@
 function generateDashboard(data,geom){
     var map = new lg.map('#map').geojson(geom).joinAttr('Iso_Code').zoom(3).center([53.5,20]);
+
+    var medCol = new lg.column('Medical Interventions').scale(d3.scale.ordinal()).domain(['No','Yes']);
+
     var grid = new lg.grid('#grid')
         .data(data)
         .width($('#grid').width())
@@ -8,9 +11,9 @@ function generateDashboard(data,geom){
         .joinAttr('ISO 3 code')
         .hWhiteSpace(10)
         .vWhiteSpace(5)
-        .columns(['Total Migrants','Active Staff','Active Volunteers','Bilateral Volunteers','Surge Volunteers','Active Locations','Beneficiaries This Week','Total Beneficiary Contacts','Women and Children Benificiaries','Water Bottle Dist','Food Parcel Dist','Hygiene Kit Dist','Medical Interventions','RFL Initatiated 2015','RFL Completed 2015','Long-Term Shelter Support','Host communities supported'])
+        .columns(['Total Migrants','Active Staff','Active Volunteers','Bilateral Volunteers','Surge Volunteers','Active Locations','Beneficiaries This Week','Total Beneficiary Contacts','Women and Children Benificiaries','Water Bottle Dist','Food Parcel Dist','Hygiene Kit Dist',medCol,'RFL Initatiated 2015','RFL Completed 2015','Long-Term Shelter Support','Host communities supported'])
         .margins({top: 150, right: 105, bottom: 20, left: 140});
-
+    lg.colors(['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026']);
     lg.init();
 
     $("#map").width($("#map").width()); 
