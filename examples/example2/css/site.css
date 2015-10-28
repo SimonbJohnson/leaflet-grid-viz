@@ -1,0 +1,39 @@
+.subtitle{
+	font-size: 12px;
+}
+
+.spacer_md {
+	margin-top: 20px;
+}
+
+.spacer_sm {
+	margin-top: 5px;
+}
+
+#map {
+    height:360px;
+	width: 100%;
+}
+
+.stat_title{
+    font-size:18px;
+}
+
+.stat {
+    font-size:48px;
+}
+
+.sub_stat {
+	font-size: 28px;
+}
+
+/* .sticky {
+    position: fixed;
+    top: 0px;
+} */
+
+/* .line {
+	border-bottom-style:solid;
+	border-bottom-color:#cccccc;
+	border-bottom-width:1px;
+} */

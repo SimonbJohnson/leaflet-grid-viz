@@ -1,6 +1,8 @@
 function generateDashboard(data,geom){
     var map = new lg.map('#map').geojson(geom).joinAttr('id').zoom(4).center([10,35]);
 
+    var coping = new lg.column('COPINGCAPACITY').label('Lack of Coping').domain([0,10]);
+
     var grid = new lg.grid('#grid')
         .data(data)
         .width($('#grid').width())
@@ -9,7 +11,7 @@ function generateDashboard(data,geom){
         .joinAttr('ID')
         .hWhiteSpace(5)
         .vWhiteSpace(10)
-        .columns(['VULNERABILITY','HAZARDS','COPINGCAPACITY','INFORM','REFUGEES','FUNDED','COMMITTED']);
+        .columns(['VULNERABILITY','HAZARDS',coping,'INFORM','REFUGEES','FUNDED','COMMITTED']);
 
     lg.init();
 }
