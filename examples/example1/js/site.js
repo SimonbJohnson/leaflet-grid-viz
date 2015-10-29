@@ -14,6 +14,7 @@ function generateDashboard(data,geom){
         .columns(['VULNERABILITY','HAZARDS',coping,'INFORM','REFUGEES','FUNDED','COMMITTED']);
 
     lg.init();
+
 }
 
 //load data
