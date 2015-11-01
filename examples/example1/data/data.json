@@ -199,15 +199,15 @@
     "FUNDED":0,
     "REFUGEES":137000,
     "IDPS":0,
-    "INFORM":0,
+    "INFORM":"",
     "FS":0,
     "NUTRITION":0,
     "HEALTH":0,
     "WASH":0,
-    "EDUCATION":0,
-    "HAZARDS":0,
-    "VULNERABILITY":0,
-    "COPINGCAPACITY":0,
+    "EDUCATION":null,
+    "HAZARDS":null,
+    "VULNERABILITY":null,
+    "COPINGCAPACITY":null,
     "PRIORITIES":""
   }
 ]
