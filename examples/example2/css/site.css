@@ -16,15 +16,20 @@
 }
 
 .stat_title{
-    font-size:18px;
+	display: inline-block;
+	margin-top: 18px;
+    font-size:16px;
 }
 
 .stat {
-    font-size:48px;
+	display: inline-block;
+	text-align: right;
+    font-size:24px;
 }
 
 .sub_stat {
-	font-size: 28px;
+	display: inline-block;
+	font-size: 24px;
 }
 
 /* .sticky {
