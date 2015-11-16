@@ -146,6 +146,15 @@ var lg =  {
             }        
         };
 
+        this.scale = function(val){
+            if(typeof val === 'undefined'){
+                return this._scale;
+            } else {
+                this._scale=val;
+                return this;
+            }        
+        };        
+
         this.domain = function(val){
             if(typeof val === 'undefined'){
                 return this._domain;
@@ -182,6 +191,15 @@ var lg =  {
             }
         };
 
+        this.labelAccessor = function(val){
+            if(typeof val === 'undefined'){
+                return this._labelAccessor;
+            } else {
+                this._labelAccessor = val;
+                return this;
+            }
+        };
+
         this.colors = function(val){
             if(typeof val === 'undefined'){
                 return this._colors;
@@ -199,7 +217,15 @@ var lg =  {
             var c = Math.floor(d/max*5);
             if(c==5){c=4}
             return c
-        };             
+        };
+
+        this._labelAccessor = function(d,i){
+            if(isNaN(d) || d==null || d===''){
+                return d;
+            } else {                    
+                return d3.format('0,000')(d);
+            }
+        };                     
 
     },
 
@@ -351,17 +377,15 @@ var lg =  {
                 .append("g")
                 .attr("transform", "translate(" + this._properties.margin.left + "," + this._properties.margin.top + ")");
 
-            var tip = d3.tip().attr('class', 'd3-tip').html(function(d,i) {
-                if(isNaN(d.value) || d.value==null || d.value===''){
-                    return d.value;
-                } else {                    
-                    return d3.format('0,000')(d.value);
-                }
-            });
+            var tipsort = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return "Click to sort"});
 
-            var tipsort = d3.tip().attr('class', 'd3-tip').html(function(d,i) {return "Click to sort"});     
+            var tips=[];     
 
             columns.forEach(function(v,i){
+
+                tips[i] = d3.tip().attr('class', 'd3-tip').html(function(d,i) {
+                    return v._labelAccessor(d.value);
+                });                
 
                 var g = _grid.append("g").attr('class','bars');
 
@@ -424,7 +448,7 @@ var lg =  {
 
                 if(v._axisLabels){
                     g.append("text")
-                        .text(d3.format(".4s")(v._domain[v._domain.length-1]))        
+                        .text(v._labelAccessor(v._domain[v._domain.length-1]))        
                         .attr("x",_parent._properties.boxWidth-5)
                         .attr("y",_parent._properties.height+_parent._vWhiteSpace)               
                         .style("text-anchor", "front")
@@ -433,7 +457,7 @@ var lg =  {
                         .attr("class",function(d){return "maxLabel"+i});
 
                     g.append("text")
-                        .text(d3.format(".4s")(v._domain[0]))        
+                        .text(v._labelAccessor(v._domain[0]))        
                         .attr("x",-5)
                         .attr("y",_parent._properties.height+_parent._vWhiteSpace)               
                         .style("text-anchor", "front")
@@ -477,7 +501,7 @@ var lg =  {
                     .attr("height", _parent._properties.boxHeight+_parent._vWhiteSpace)
                     .attr("opacity",0)
                     
-                d3.selectAll('.selectbars'+i).call(tip);
+                d3.selectAll('.selectbars'+i).call(tips[i]);
 
                 selectBars.on("mouseover",function(d,i2){
 
@@ -514,9 +538,9 @@ var lg =  {
                             lg._selectedBar = i;
                             d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
                         };
-                    })
+                    });
 
-                d3.selectAll('.selectbars'+i).on('mouseover.something', tip.show).on('mouseout.something', tip.hide);
+                d3.selectAll('.selectbars'+i).on('mouseover.something', tips[i].show).on('mouseout.something', tips[i].hide);
                 d3.selectAll('.sortLabel').on('mouseover.something', tipsort.show).on('mouseout.something', tipsort.hide);         
                                                        
             })
@@ -580,7 +604,6 @@ var lg =  {
                     }                    
                     return parseFloat(sortBy._valueAccessor(b[sortBy._dataName]))-parseFloat(sortBy._valueAccessor(a[sortBy._dataName]));
                 });
-
             data.forEach(function(d,i){
                 d.pos = i;
             });

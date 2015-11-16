@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Europe Migrants</title>
+        <title>Europe Population Movement</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -13,14 +13,24 @@
         <script src="js/leaflet.js"></script>
         <script src="js/tile.stamen.js"></script>
         <script src="../../leaflet-grid-graph.js"></script>
-        <script src="js/topojson.v1.min.js"></script>    
+        <script src="js/topojson.v1.min.js"></script>  
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-46399763-1']);
+            _gaq.push(['_trackPageview']);
+            (function() {
+                 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>   
     </head>
     <body>
 		<div class="container dashboard">
 			<div class="row">
-				<div class="col-md-4">
-						<h2>Europe Migrants - SitRep</h2>
-						<p class="subtitle">Europe Migrants Crisis 2015 - Situation Report</p>
+				<div class="col-md-4 spacer_md">
+						<p class="title">Europe Population Movement</p>
+						<p class="subtitle">Europe Population Movement 2015 - Situation Report</p>
 					</div>
 					<div class="col-md-4 spacer_md">
 						<p>
@@ -32,7 +42,7 @@
 					<div class="col-md-4 spacer_md">
 						<p>
 						Source: <a href="https://www.ifrc.org" target="_blank">IFRC</a> and <a href="https://www.ifrc.org/en/who-we-are/directory/contact-information/" target="_blank">Individual National Societies</a><br/>
-						<i>Data updated: 1 November 2015</i><br/>
+						<i>Data updated: 11 November 2015</i><br/>
 						<h5>For feedback email: <a href="mailto:ryales@redcross.org.uk?subject=EuropeMigrantsSitRep-online-Feedback">ryales@redcross.org.uk</a></h5>
 						</p>
 					</div>
@@ -40,11 +50,12 @@
 			<div class="row spacer_sm">           
 					<!-- <div id="sticky-anchor"></div>  -->
 				<div class="col-md-8" id="map-container">
+					<p>[Hover over gridded data table below to display country data in map]</p>
 					<div id="map"></div>
 				</div>
 				<div class="col-md-4">
-					<h4 id="key_stats_title">Key Statistics</h4>
-                    <div id="key_stats"></div>
+					<h4 id="key_stats_title"><br/>Key Statistics</h4>
+					<div id="key_stats"></div>
 				</div>
 			</div>
 			<div class="row">

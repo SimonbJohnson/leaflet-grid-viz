@@ -1,16 +1,19 @@
-/* HEIDI NEXT:
-	- change min/max values of cardinal attributes - check with Rachel, might not be necessary for now
-	- use/display date column?
-	- add shapefile for locations - Simon to update library first - need qgis to accept utf-8
-	- remove/change headline figures
+/* NEXT CHANGES:
+	- row headings - right justify, horizontal highlight lines more obvious? - needs to be done in library
+	- objectify stats generation
+	- *** add shapefile for locations - Simon to update library first - need qgis to accept utf-8
+	- *** display which attribute is being displayed on map - Simon to update library
+	- ? add interactive tips for how to use dashboard - see intro.js library - see Simon's Nepal earthquake RC 3W
 */
  
 function generateDashboard(data,geom){
     var map = new lg.map('#map').geojson(geom).joinAttr('Iso_Code').zoom(3).center([53.5,20]);
 	
-	var resLocs = new lg.column('Response Locations').domain([0,400]);
+	var resLocs = new lg.column('Response Locations');   //change this 
 	
-	var domAppeal = new lg.column('Domestic appeal (Y/N)').domain([0,1]).axisLabels(false).valueAccessor(function(d){
+	var pplReached = new lg.column('Total people reached').label('Total RC interactions');
+	
+/* 	var domAppeal = new lg.column('Domestic appeal (Y/N)').domain([0,1]).axisLabels(false).valueAccessor(function(d){
         if(d=='Yes' || d== 'No'){
             return 1;
         } else {
@@ -24,39 +27,78 @@ function generateDashboard(data,geom){
             return 0;
         }
     })
-    .colors(['#bd0026','#2E7D32']);
+    .colors(['#bd0026','#2E7D32']); 
+	
+	var appFundLocal = new lg.column('Appeal funding (local currency)').axisLabels(true); 
+	
+	var maxCHF = d3.max(data, function(d){
+		if (!isNaN(d['Appeal funding (CHF)'])){return d['Appeal funding (CHF)'];}
+	});
+	var appFundCHF = new lg.column('Appeal funding (CHF)').domain([0,Math.ceil(maxCHF).toPrecision(2)]);
+	*/
 
-    var updateDates = new lg.column('Last data update')
-    .scale( d3.time.scale())
-    .domain([d3.min(data,function(d){
-        return new Date (d['Last data update'].getFullYear(), d['Last data update'].getMonth(), (d['Last data update'].getDate()-1));
-    }),d3.max(data,function(d){return d['Last data update']})])
+	
+	
+	var updateDates = new lg.column('Last data update').axisLabels(false)
+    .scale(d3.time.scale())
+ 	.domain([0,Date.now()])   
     .labelAccessor(function(d){
-        var month = d.getMonth() + 1;
-        var day = d.getDate();
-        return day +'-'+month;
+		if (Number(d)!=0){
+			var year = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+			return day+'/'+month+'/'+year;
+		} else {
+            return 'No data reported';
+        }
     })
-    .valueAccessor(function(d){
-        return Number(d);
-    });
-
+ 	.valueAccessor(function(d){
+        if (Number(d)!=0){
+			return Number(d);
+        } else {
+            return null;
+        } 
+    }) 
+    .colorAccessor(function(d,i,max){    
+        if (Date.now()-Number(d)<=1.123e+9){   //updated within last 13 days = 1.123e+9ms
+            return 0;
+		} else if (Date.now()-Number(d)>1.123e+9){  //updated before last 13 days
+			return 1;
+        } 
+    })
+    .colors(['#2E7D32','#ff8c1a']);  
+	
+	
+	function getGridWidth(divWidth) {
+		if (divWidth<750) {
+			return 750;
+		} else {
+			return divWidth;
+		};
+	};
+ 	var grid_width = getGridWidth($("#grid").width());
+	//console.log($("#grid").width(), grid_width);
+			 
+			 
     var grid = new lg.grid('#grid')
         .data(data)
-        .width($('#grid').width())
-        .height(500)
+        .width(grid_width)
+        .height(750)
         .nameAttr('Country')
         .joinAttr('ISO 3 code')
         .hWhiteSpace(10)
         .vWhiteSpace(5)
- 		.columns(['Total Migrants 2015', resLocs, 'Active volunteers', 'Active staff', 'Distributions: Relief kits', 'Distributions: Hygiene items', 'Distributions: Food parcels', 'Distributions: Meals', 'Distributions: Water bottles', 'Distributions: Blankets and sleeping bags', 'Distributions: Clothing', 'Provision of connectivity', 'Provision of medical care', 'Provision of first aid', 'Provision of psychosocial support', 'Total people reached', domAppeal, 'Appeal funding (local currency)', 'Appeal funding (CHF)', updateDates]) 
-        .margins({top: 165, right: 110, bottom: 20, left: 140});
+ 		.columns(['Total Migrants 2015', resLocs, 'Active volunteers', 'Active staff', 'Distributions: Relief kits', 'Distributions: Hygiene items', 'Distributions: Food parcels', 'Distributions: Meals', 'Distributions: Water bottles', 'Distributions: Blankets and sleeping bags', 'Distributions: Clothing', 'Provision of connectivity', 'Provision of medical care', 'Provision of first aid', 'Provision of psychosocial support', 'RFL requests',pplReached, updateDates]) 
+        .margins({top: 165, right: 50, bottom: 20, left: 290});
 	//lg.colors(['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c']);  //blue-green multi-hue
 	lg.colors(['#feebe2','#fbb4b9','#f768a1','#c51b8a','#7a0177']);  //pink-purple multi-hue
 	//lg.colors(['#f1eef6','#d7b5d8','#df65b0','#dd1c77','#980043']); //purple-red multi-hue
 	//lg.colors(['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026']); //yellow-orange-red multi-hue
     lg.init();
 
-    $("#map").width($("#map").width()); 
+    $("#map").width($("#map").width());
+
+    console.log(map.map()); 
 }
 
 
@@ -118,19 +160,17 @@ function generateStats(id,data){
 		if (!isNaN(numConnect)) {totalConnectivity += numConnect;};
 	}; 
 	
-    var html = '';
-    html = html + '<div class="stat_title">Total People Reached</div><div class="stat">&nbsp&nbsp'+ formatComma(totalPplReached) + '</div>';
-    html = html + '<div class="stat_title">Volunteers Mobilised</div><div class="stat">&nbsp&nbsp'+ formatComma(totalVols) + '</div>';   
-    html = html + '</div>';
-	html = html + '<div class="stat_title">Total Food Distributions</div><div class="stat">&nbsp&nbsp'+ formatComma(totalFoodDists) + '</div>';   
-    html = html + '</div>';
-	html = html + '<div class="stat_title">Total Health Services</div><div class="stat">&nbsp&nbsp'+ formatComma(totalMeds) + '</div>';   
-    html = html + '</div>';
-	html = html + '<div class="stat_title">Total Textiles Provided</div><div class="stat">&nbsp&nbsp'+ formatComma(totalTextiles) + '</div>';   
-    html = html + '</div>';
-	html = html + '<div class="stat_title">Total Connectivity</div><div class="stat">&nbsp&nbsp'+ formatComma(totalConnectivity) + '</div>';   
-    html = html + '</div>';
-    $(id).html(html);
+	var html = '';
+	html = html + '<table class="stats_table">';
+	html = html + '<tr><td class="stat_title">Total RC interactions</td><td class="stat">' + formatComma(totalPplReached) + '</td>';
+	html = html + '<tr><td class="stat_title">Volunteers Mobilised</td><td class="stat">' + formatComma(totalVols) + '</td>';
+	html = html + '<tr><td class="stat_title">Total Food Distributions</td><td class="stat">' + formatComma(totalFoodDists) + '</td>';
+	html = html + '<tr><td class="stat_title">Total Health Services</td><td class="stat">' + formatComma(totalMeds) + '</td>';
+	html = html + '<tr><td class="stat_title">Total Textiles Provided</td><td class="stat">' + formatComma(totalTextiles) + '</td>';
+	html = html + '<tr><td class="stat_title">Total Connectivity</td><td class="stat">' + formatComma(totalConnectivity) + '</td>';
+	html = html + '</table>';
+	$(id).html(html);
+	
 }
 
 /*
@@ -155,14 +195,14 @@ $(window).scroll(function(){
 // WITH THE FORCE...
 var dataCall = $.ajax({ 
     type: 'GET', 
-    url: 'https://proxy.hxlstandard.org/data.json?filter01=replace-map&replace-map-url01=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D493036357%26single%3Dtrue%26output%3Dcsv&filter02=merge&merge-url02=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D0%26single%3Dtrue%26output%3Dcsv&merge-tags02=%23country%2Bcode&merge-keys02=%23country-code&force=on&url=https%3A//docs.google.com/spreadsheets/d/17UV2Zqkz6YDWIEgzT16_XCMLE7_VXjo7U-Wme01fnXQ/edit%3Fusp%3Ddrive_web',
+    url: 'http://proxy.hxlstandard.org/data.json?filter01=replace-map&replace-map-url01=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D493036357%26single%3Dtrue%26output%3Dcsv&filter02=merge&merge-url02=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D0%26single%3Dtrue%26output%3Dcsv&merge-tags02=%23country%2Bcode&merge-keys02=%23country-code&force=on&url=https%3A//docs.google.com/spreadsheets/d/17UV2Zqkz6YDWIEgzT16_XCMLE7_VXjo7U-Wme01fnXQ/edit%3Fusp%3Ddrive_web',
     dataType: 'json',
 });  
 
 // WITHOUT THE FORCE...
 /* var dataCall = $.ajax({ 
     type: 'GET', 
-    url: 'https://proxy.hxlstandard.org/data.json?filter01=replace-map&replace-map-url01=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D493036357%26single%3Dtrue%26output%3Dcsv&filter02=merge&merge-url02=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D0%26single%3Dtrue%26output%3Dcsv&merge-tags02=%23country%2Bcode&merge-keys02=%23country-code&url=https%3A//docs.google.com/spreadsheets/d/17UV2Zqkz6YDWIEgzT16_XCMLE7_VXjo7U-Wme01fnXQ/edit%3Fusp%3Ddrive_web',
+    url: 'http://proxy.hxlstandard.org/data.json?filter01=replace-map&replace-map-url01=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D493036357%26single%3Dtrue%26output%3Dcsv&filter02=merge&merge-url02=https%3A//docs.google.com/spreadsheets/d/12TdWAO9BmavBkGEM-7hPV7IMjN_EOJY_2iGnW_ezjuk/pub%3Fgid%3D0%26single%3Dtrue%26output%3Dcsv&merge-tags02=%23country%2Bcode&merge-keys02=%23country-code&url=https%3A//docs.google.com/spreadsheets/d/17UV2Zqkz6YDWIEgzT16_XCMLE7_VXjo7U-Wme01fnXQ/edit%3Fusp%3Ddrive_web',
     dataType: 'json',
 });  */
 
@@ -179,13 +219,15 @@ var geomCall = $.ajax({
 
 $.when(dataCall, geomCall).then(function(dataArgs, geomArgs){
     var geom = topojson.feature(geomArgs[0],geomArgs[0].objects.geom);
-    console.log(geom);
+    //console.log(geom);
     var data = hxlProxyToJSON(dataArgs[0],true);
-    var dateFormat = d3.time.format("%d %b %Y");
-
+    //console.log(data);
+	var dateFormat = d3.time.format("%d %b %Y");
     data.forEach(function(d){
         d['Last data update'] = dateFormat.parse(d['Last data update']);
     });
     generateDashboard(data,geom);
 	generateStats("#key_stats",data);
+	
 });
+

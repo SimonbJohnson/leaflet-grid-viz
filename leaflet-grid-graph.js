@@ -439,7 +439,9 @@ var lg =  {
                     .attr("y",0)               
                     .style("text-anchor", "front")
                     .attr("transform", "translate(" + (_xTransform+ _parent._properties.boxWidth/2-10) + "," + -10 + ") rotate(-65)" )
-                    .attr("class","sortLabel")
+                    .attr("class",function(d){
+                        return "sortLabel sortLabel"+i;
+                    })
                     .on("click",function(){
                         _parent._update(data,columns,v,nameAttr);
                     });
@@ -503,12 +505,14 @@ var lg =  {
                     
                 d3.selectAll('.selectbars'+i).call(tips[i]);
 
+                var dataSubset = [];
+                    newData.forEach(function(d){
+                        dataSubset.push({'key':d.join,'value':d.value});
+                    });
+
                 selectBars.on("mouseover",function(d,i2){
 
-                        var dataSubset = [];
-                        newData.forEach(function(d){
-                            dataSubset.push({'key':d.join,'value':d.value});
-                        });
+
 
                         
                         d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);                        
@@ -516,6 +520,7 @@ var lg =  {
 
                         if(lg._selectedBar==-1){
                             d3.selectAll('.maxLabel'+i).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+i).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
                         }
 
@@ -528,15 +533,20 @@ var lg =  {
 
                         if(lg._selectedBar==-1){
                             d3.selectAll('.maxLabel'+i).attr("opacity",0);
+                            d3.selectAll('.sortLabel'+i).style("font-weight","normal");
                         }                        
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
                             lg._selectedBar = -1;
                         } else {
-                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",0);                          
+                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",0);
+                            d3.selectAll('.sortLabel'+lg._selectedBar).style("font-weight","normal");                          
                             lg._selectedBar = i;
                             d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+lg._selectedBar).style("font-weight","bold");
+                            console.log(v);
+                            lg.mapRegister.colorMap(dataSubset,v);
                         };
                     });
 
