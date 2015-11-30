@@ -503,22 +503,15 @@ var lg =  {
                     });
 
                 topLabels.on("mouseover",function(d,i2){
-                        console.log('hover');                      
-
                         if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel').attr("opacity",0);
+                            d3.selectAll('.sortLabel').style("font-weight","normal");
                             d3.selectAll('.maxLabel'+i).attr("opacity",1);
                             d3.selectAll('.sortLabel'+i).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
                         }
 
-                    })
-                    .on("mouseout",function(d,i2){
-
-                        if(lg._selectedBar==-1){
-                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
-                            d3.selectAll('.sortLabel'+i).style("font-weight","normal");
-                        }                        
-                    })
+                    });
 
                 d3.selectAll('.sortLabel').call(tipsort);
 
@@ -548,7 +541,7 @@ var lg =  {
                     .attr("x2", _parent._properties.boxWidth*(i+1)+(i)*_parent._hWhiteSpace)
                     .attr("y2", _parent._properties.height-_parent._vWhiteSpace/2)
                     .attr("opacity",0)
-                    .attr("class",function(d){return "maxLabel"+i})
+                    .attr("class",function(d){return "maxLabel maxLabel"+i})
                     .attr("stroke-width", 1)
                     .attr("stroke", "#ddd");                    
 
@@ -558,7 +551,7 @@ var lg =  {
                     .attr("x2", _parent._properties.boxWidth*(i)+(i)*_parent._hWhiteSpace)
                     .attr("y2", _parent._properties.height-_parent._vWhiteSpace/2)
                     .attr("opacity",0)
-                    .attr("class",function(d){return "maxLabel"+i})
+                    .attr("class",function(d){return "maxLabel maxLabel"+i})
                     .attr("stroke-width", 1)
                     .attr("stroke", "#ddd");                   
 
@@ -590,6 +583,8 @@ var lg =  {
                         d3.selectAll('.horLine'+i2).attr("opacity",1);
 
                         if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel').attr("opacity",0);
+                            d3.selectAll('.sortLabel').style("font-weight","normal");
                             d3.selectAll('.maxLabel'+i).attr("opacity",1);
                             d3.selectAll('.sortLabel'+i).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
@@ -597,15 +592,8 @@ var lg =  {
 
                     })
                     .on("mouseout",function(d,i2){
-
-
                         d3.selectAll('.horLine'+i2).attr("opacity",0);
-                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);
-
-                        if(lg._selectedBar==-1){
-                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
-                            d3.selectAll('.sortLabel'+i).style("font-weight","normal");
-                        }                        
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);                     
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
