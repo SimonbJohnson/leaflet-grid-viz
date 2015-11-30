@@ -109,6 +109,7 @@ var lg =  {
         }
 
         this.colorMap = function (data,column){
+            console.log(data);
             var _parent = this;
             var max = d3.max(data,function(d){
                 if(isNaN(d.value)){
@@ -433,7 +434,7 @@ var lg =  {
 
                 var g = _grid.append("g");
 
-                g.append("text")
+                var topLabels = g.append("text")
                     .text(v._labelName)        
                     .attr("x",0)
                     .attr("y",0)               
@@ -445,6 +446,24 @@ var lg =  {
                     .on("click",function(){
                         _parent._update(data,columns,v,nameAttr);
                     });
+
+                topLabels.on("mouseover",function(d,i2){
+                        console.log('hover');                      
+
+                        if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel'+i).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+i).style("font-weight","bold");
+                            lg.mapRegister.colorMap(dataSubset,v);
+                        }
+
+                    })
+                    .on("mouseout",function(d,i2){
+
+                        if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
+                            d3.selectAll('.sortLabel'+i).style("font-weight","normal");
+                        }                        
+                    })
 
                 d3.selectAll('.sortLabel').call(tipsort);
 
@@ -512,9 +531,6 @@ var lg =  {
 
                 selectBars.on("mouseover",function(d,i2){
 
-
-
-                        
                         d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);                        
                         d3.selectAll('.horLine'+i2).attr("opacity",1);
 
