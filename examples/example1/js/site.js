@@ -1,5 +1,5 @@
 function generateDashboard(data,geom){
-    var map = new lg.map('#map').geojson(geom).joinAttr('id').zoom(4).center([10,35]);
+    var map = new lg.map('#map').geojson(geom).nameAttr('name').joinAttr('id').zoom(4).center([10,35]);
 
     var coping = new lg.column('COPINGCAPACITY').label('Lack of Coping').domain([0,10]);
 

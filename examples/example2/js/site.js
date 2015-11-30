@@ -7,7 +7,7 @@
 */
  
 function generateDashboard(data,geom){
-    var map = new lg.map('#map').geojson(geom).joinAttr('Iso_Code').zoom(3).center([53.5,20]);
+    var map = new lg.map('#map').geojson(geom).nameAttr('CNTRY_NAME').joinAttr('Iso_Code').zoom(3).center([53.5,20]);
 	
 	var resLocs = new lg.column('Response Locations');   //change this 
 	

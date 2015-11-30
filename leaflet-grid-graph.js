@@ -29,8 +29,11 @@ var lg =  {
         this._geojson = "";
         this._center = [0,0];
         this._zoom = 1;
+        this._nameAttr = "";
         this._joinAttr = "";
         this._map = '';
+        this._info = '';
+        this._currentData ='';
 
         lg.mapRegister = this;
 
@@ -71,6 +74,15 @@ var lg =  {
             }        
         };
 
+        this.nameAttr = function(val){
+            if(typeof val === 'undefined'){
+                return this._nameAttr;
+            } else {
+                this._nameAttr=val;
+                return this;
+            }        
+        };        
+
         this._style = function(feature){
             return {
                 weight: 1,
@@ -91,6 +103,8 @@ var lg =  {
 
         this._initMap = function(id,geojson, center, zoom, joinAttr){
 
+            var _parent = this;
+
             var baselayer = L.tileLayer('https://data.hdx.rwlabs.org/mapbox-base-tiles/{z}/{x}/{y}.png', {
                 
             });
@@ -101,16 +115,56 @@ var lg =  {
                 layers: [baselayer]
             });
 
-            var overlay = L.geoJson(geojson,{
-                style: this._style
-            }).addTo(map);
+            this._info = L.control();
 
-            return map;            
+            this._info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'mapinfo');
+                this.update();
+                    return this._div;
+                };
+
+            this._info.update = function (name) {
+                this._div.innerHTML = (name ? name: 'Hover a country for details');
+            };
+
+            this._info.addTo(map);
+
+            var overlay = L.geoJson(geojson,{
+                style: this._style,
+                onEachFeature: onEachFeature
+            }).addTo(map);                
+
+            return map;
+
+            function onEachFeature(feature, layer) {
+                layer.on("mouseover",function(f,l){
+                    _parent._info.update(f.target.feature.properties[_parent._nameAttr] + ' - ' + findCurrentData(f.target.feature.properties[_parent._joinAttr]));
+                });
+
+                layer.on("mouseout",function(f,l){
+                    _parent._info.update();
+                });
+
+                function findCurrentData(joinAttr){
+                    var value = 'N/A';
+                    _parent._currentData.forEach(function(d){
+                        if(d.key==joinAttr){
+                            value = d.value;
+                        }
+                    });
+
+                    return value;
+                }
+            }            
         }
 
+
+
         this.colorMap = function (data,column){
-            console.log(data);
+
+            this._currentData = data;
             var _parent = this;
+
             var max = d3.max(data,function(d){
                 if(isNaN(d.value)){
                     dn=0;
@@ -119,6 +173,7 @@ var lg =  {
                 }
                 return Number(dn);
             });
+
             data.forEach(function(d,i){
                 if(column._valueAccessor(d.value)==null||isNaN(column._valueAccessor(d.value))||column._valueAccessor(d.value)===''){
                     d3.selectAll('.dashgeom'+d.key).attr('fill','#cccccc').attr('fill-opacity',0.8);
