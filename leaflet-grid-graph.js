@@ -593,7 +593,10 @@ var lg =  {
                     })
                     .on("mouseout",function(d,i2){
                         d3.selectAll('.horLine'+i2).attr("opacity",0);
-                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);                     
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);  
+                        if(lg._selectedBar==-1){
+                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
+                        } 
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
