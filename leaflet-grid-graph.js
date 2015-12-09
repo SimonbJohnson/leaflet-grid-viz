@@ -534,7 +534,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i});
 
                     g.append("text")
                         .text(v._labelAccessor(v._domain[0]))        
@@ -543,7 +543,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i});
                 }                    
 
                 g.append("line")
@@ -605,9 +605,6 @@ var lg =  {
                     .on("mouseout",function(d,i2){
                         d3.selectAll('.horLine'+i2).attr("opacity",0);
                         d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);  
-                        if(lg._selectedBar==-1){
-                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
-                        } 
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
