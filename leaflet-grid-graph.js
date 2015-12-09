@@ -10,10 +10,6 @@ var lg =  {
         this._gridRegister.init();
     },
 
-    update: function(){
-        console.log('update');
-    },
-
     colors:function(val){
         if(typeof val === 'undefined'){
             return this._colors;
@@ -33,7 +29,7 @@ var lg =  {
         this._joinAttr = "";
         this._map = '';
         this._info = '';
-        this._currentData ='';
+        this._currentData =[];
 
         lg.mapRegister = this;
 
@@ -81,7 +77,16 @@ var lg =  {
                 this._nameAttr=val;
                 return this;
             }        
-        };        
+        };
+
+        this.onClick = function(val){
+            if(typeof val === 'undefined'){
+                return this._onClick;
+            } else {
+                this._onClick=val;
+                return this;
+            }
+        }        
 
         this._style = function(feature){
             return {
@@ -92,6 +97,10 @@ var lg =  {
                 className: 'dashgeom dashgeom'+feature.properties[lg.mapRegister._joinAttr]
             };
         };
+
+        this._onClick = function(feature){
+            return feature;
+        }
 
         this.map = function(){
             return this._map;
@@ -145,8 +154,12 @@ var lg =  {
                     _parent._info.update();
                 });
 
+                layer.on("click",function(f,l){
+                    _parent._onClick(f.target.feature);
+                });
+
                 function findCurrentData(joinAttr){
-                    var value = 'N/A';
+                    var value = 'N/A'; 
                     _parent._currentData.forEach(function(d){
                         if(d.key==joinAttr){
                             value = d.value;
@@ -157,8 +170,6 @@ var lg =  {
                 }
             }            
         }
-
-
 
         this.colorMap = function (data,column){
 
@@ -523,7 +534,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i});
 
                     g.append("text")
                         .text(v._labelAccessor(v._domain[0]))        
@@ -532,7 +543,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i});
                 }                    
 
                 g.append("line")
@@ -593,7 +604,7 @@ var lg =  {
                     })
                     .on("mouseout",function(d,i2){
                         d3.selectAll('.horLine'+i2).attr("opacity",0);
-                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);                     
+                        d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);  
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
@@ -604,7 +615,6 @@ var lg =  {
                             lg._selectedBar = i;
                             d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
                             d3.selectAll('.sortLabel'+lg._selectedBar).style("font-weight","bold");
-                            console.log(v);
                             lg.mapRegister.colorMap(dataSubset,v);
                         };
                     });
