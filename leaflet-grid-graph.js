@@ -29,7 +29,7 @@ var lg =  {
         this._joinAttr = "";
         this._map = '';
         this._info = '';
-        this._currentData ='';
+        this._currentData =[];
 
         lg.mapRegister = this;
 
@@ -159,7 +159,7 @@ var lg =  {
                 });
 
                 function findCurrentData(joinAttr){
-                    var value = 'N/A';
+                    var value = 'N/A'; 
                     _parent._currentData.forEach(function(d){
                         if(d.key==joinAttr){
                             value = d.value;
