@@ -1,17 +1,15 @@
 var lg =  {
-
+		
     mapRegister:'',
-    _gridRegister:'',
+    _gridRegister:[],
     _colors:['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'],
     _selectedBar:-1,
 
     init: function(){
         this.mapRegister.init();
-        this._gridRegister.init();
-    },
-
-    update: function(){
-        console.log('update');
+        this._gridRegister.forEach(function(e){
+           e.init(); 
+        });       
     },
 
     colors:function(val){
@@ -33,7 +31,8 @@ var lg =  {
         this._joinAttr = "";
         this._map = '';
         this._info = '';
-        this._currentData ='';
+        this._currentData =[];
+		this._currentColumn = "";
 
         lg.mapRegister = this;
 
@@ -81,8 +80,26 @@ var lg =  {
                 this._nameAttr=val;
                 return this;
             }        
-        };        
+        };
 
+        this.onClick = function(val){
+            if(typeof val === 'undefined'){
+                return this._onClick;
+            } else {
+                this._onClick=val;
+                return this;
+            }
+        }        
+
+ 		this.onHover = function(val){
+            if(typeof val === 'undefined'){
+                return this._onHover;
+            } else {
+                this._onHover=val;
+                return this;
+            }
+        }    
+		
         this._style = function(feature){
             return {
                 weight: 1,
@@ -92,6 +109,10 @@ var lg =  {
                 className: 'dashgeom dashgeom'+feature.properties[lg.mapRegister._joinAttr]
             };
         };
+
+        this._onClick = function(feature){
+            return feature;
+        }
 
         this.map = function(){
             return this._map;
@@ -123,8 +144,8 @@ var lg =  {
                     return this._div;
                 };
 
-            this._info.update = function (name) {
-                this._div.innerHTML = (name ? name: 'Hover a country for details');
+            this._info.update = function (name, colName) {
+                this._div.innerHTML = ((name && colName) ? (colName + '<br><p style="font-size: 16px; text-align:right;">' + name) : 'Select a grid column and hover a country for details');
             };
 
             this._info.addTo(map);
@@ -137,16 +158,28 @@ var lg =  {
             return map;
 
             function onEachFeature(feature, layer) {
+				var formatComma = d3.format(",.0f");
                 layer.on("mouseover",function(f,l){
-                    _parent._info.update(f.target.feature.properties[_parent._nameAttr] + ' - ' + findCurrentData(f.target.feature.properties[_parent._joinAttr]));
+					columnName = _parent._currentColumn;
+					dataValue = findCurrentData(f.target.feature.properties[_parent._joinAttr]);
+					if (!isNaN(dataValue)) {
+						dataValue = formatComma(dataValue);
+					};
+					console.log(dataValue);
+                    _parent._info.update(f.target.feature.properties[_parent._nameAttr] + ' - ' + dataValue, columnName);
+					_parent._onHover(f.target.feature);
                 });
 
                 layer.on("mouseout",function(f,l){
                     _parent._info.update();
                 });
 
+                layer.on("click",function(f,l){
+                    _parent._onClick(f.target.feature);
+                });
+
                 function findCurrentData(joinAttr){
-                    var value = 'N/A';
+                    var value = 'n/a'; 
                     _parent._currentData.forEach(function(d){
                         if(d.key==joinAttr){
                             value = d.value;
@@ -155,16 +188,19 @@ var lg =  {
 
                     return value;
                 }
+			
             }            
         }
 
-
-
         this.colorMap = function (data,column){
 
-            this._currentData = data;
+            this._currentData = data;	
+			//var _colName = column._labelName;
+			//console.log("column name = ", _colName);
+			this._currentColumn = column._labelName; 
+			
             var _parent = this;
-
+			
             var max = d3.max(data,function(d){
                 if(isNaN(d.value)){
                     dn=0;
@@ -182,6 +218,8 @@ var lg =  {
                     d3.selectAll('.dashgeom'+d.key).attr('fill',column._colors[c]).attr('fill-opacity',0.8);
                 }
             });
+			
+			
         }
     },
 
@@ -298,7 +336,8 @@ var lg =  {
         this._vWhiteSpace = 1;
         this._hWhiteSpace = 1;
         this._properties.margin = {top: 120, right: 50, bottom: 20, left: 120};
-        lg._gridRegister = this;
+        lg._gridRegister.push(this);
+        this._idnum = lg._gridRegister.length-1;
 
         this.width = function(val){
             if(typeof val === 'undefined'){
@@ -427,7 +466,7 @@ var lg =  {
 
             var _grid = d3.select(id)
                 .append('svg')
-                .attr('class', 'dashgrid')
+                .attr('class', 'dashgrid dashgridid'+_parent._idnum)
                 .attr('width', width)
                 .attr('height', height)
                 .append("g")
@@ -467,7 +506,7 @@ var lg =  {
                     .data(newData)
                     .enter()
                     .append("rect")
-                    .attr('class','bars'+i)
+                    .attr('class','bars'+i+'id'+_parent._idnum)
                     .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
                     .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
                     .attr("width", function(d){
@@ -494,9 +533,9 @@ var lg =  {
                     .attr("x",0)
                     .attr("y",0)               
                     .style("text-anchor", "front")
-                    .attr("transform", "translate(" + (_xTransform+ _parent._properties.boxWidth/2-10) + "," + -10 + ") rotate(-65)" )
+                    .attr("transform", "translate(" + (_xTransform+ _parent._properties.boxWidth/2-10) + "," + -10 + ") rotate(-35)" )
                     .attr("class",function(d){
-                        return "sortLabel sortLabel"+i;
+                        return "sortLabel sortLabel"+i+'id'+_parent._idnum;
                     })
                     .on("click",function(){
                         _parent._update(data,columns,v,nameAttr);
@@ -506,8 +545,8 @@ var lg =  {
                         if(lg._selectedBar==-1){
                             d3.selectAll('.maxLabel').attr("opacity",0);
                             d3.selectAll('.sortLabel').style("font-weight","normal");
-                            d3.selectAll('.maxLabel'+i).attr("opacity",1);
-                            d3.selectAll('.sortLabel'+i).style("font-weight","bold");
+                            d3.selectAll('.maxLabel'+i+'id'+_parent._idnum).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+i+'id'+_parent._idnum).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
                         }
 
@@ -523,7 +562,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i+'id'+_parent._idnum});
 
                     g.append("text")
                         .text(v._labelAccessor(v._domain[0]))        
@@ -532,7 +571,7 @@ var lg =  {
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
-                        .attr("class",function(d){return "maxLabel"+i});
+                        .attr("class",function(d){return "maxLabel maxLabel"+i+'id'+_parent._idnum});
                 }                    
 
                 g.append("line")
@@ -541,7 +580,7 @@ var lg =  {
                     .attr("x2", _parent._properties.boxWidth*(i+1)+(i)*_parent._hWhiteSpace)
                     .attr("y2", _parent._properties.height-_parent._vWhiteSpace/2)
                     .attr("opacity",0)
-                    .attr("class",function(d){return "maxLabel maxLabel"+i})
+                    .attr("class",function(d){return "maxLabel maxLabel"+i+'id'+_parent._idnum})
                     .attr("stroke-width", 1)
                     .attr("stroke", "#ddd");                    
 
@@ -551,7 +590,7 @@ var lg =  {
                     .attr("x2", _parent._properties.boxWidth*(i)+(i)*_parent._hWhiteSpace)
                     .attr("y2", _parent._properties.height-_parent._vWhiteSpace/2)
                     .attr("opacity",0)
-                    .attr("class",function(d){return "maxLabel maxLabel"+i})
+                    .attr("class",function(d){return "maxLabel maxLabel"+i+'id'+_parent._idnum})
                     .attr("stroke-width", 1)
                     .attr("stroke", "#ddd");                   
 
@@ -561,7 +600,7 @@ var lg =  {
                     .data(newData)
                     .enter()
                     .append("rect")
-                    .attr('class','selectbars'+i)
+                    .attr('class','selectbars'+i+'id'+_parent._idnum)
                     .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
                     .attr("y", function(d,i2){return _parent._properties.boxHeight*i2+i2*_parent._vWhiteSpace})
                     .attr("width", function(d){
@@ -570,7 +609,7 @@ var lg =  {
                     .attr("height", _parent._properties.boxHeight+_parent._vWhiteSpace)
                     .attr("opacity",0)
                     
-                d3.selectAll('.selectbars'+i).call(tips[i]);
+                d3.selectAll('.selectbars'+i+'id'+_parent._idnum).call(tips[i]);
 
                 var dataSubset = [];
                     newData.forEach(function(d){
@@ -580,39 +619,35 @@ var lg =  {
                 selectBars.on("mouseover",function(d,i2){
 
                         d3.selectAll('.dashgeom'+d.join).attr("stroke-width",3);                        
-                        d3.selectAll('.horLine'+i2).attr("opacity",1);
+                        d3.selectAll('.horLine'+i2+'id'+_parent._idnum).attr("opacity",1);
 
                         if(lg._selectedBar==-1){
                             d3.selectAll('.maxLabel').attr("opacity",0);
                             d3.selectAll('.sortLabel').style("font-weight","normal");
-                            d3.selectAll('.maxLabel'+i).attr("opacity",1);
-                            d3.selectAll('.sortLabel'+i).style("font-weight","bold");
+                            d3.selectAll('.maxLabel'+i+'id'+_parent._idnum).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+i+'id'+_parent._idnum).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
                         }
 
                     })
                     .on("mouseout",function(d,i2){
-                        d3.selectAll('.horLine'+i2).attr("opacity",0);
+                        d3.selectAll('.horLine'+i2+'id'+_parent._idnum).attr("opacity",0);
                         d3.selectAll('.dashgeom'+d.join).attr("stroke-width",1);  
-                        if(lg._selectedBar==-1){
-                            d3.selectAll('.maxLabel'+i).attr("opacity",0);
-                        } 
                     })
                     .on('click',function(d,i2){
                         if(lg._selectedBar ==i){
                             lg._selectedBar = -1;
                         } else {
-                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",0);
-                            d3.selectAll('.sortLabel'+lg._selectedBar).style("font-weight","normal");                          
+                            d3.selectAll('.maxLabel'+lg._selectedBar+'id'+_parent._idnum).attr("opacity",0);
+                            d3.selectAll('.sortLabel'+lg._selectedBar+'id'+_parent._idnum).style("font-weight","normal");                          
                             lg._selectedBar = i;
-                            d3.selectAll('.maxLabel'+lg._selectedBar).attr("opacity",1);
-                            d3.selectAll('.sortLabel'+lg._selectedBar).style("font-weight","bold");
-                            console.log(v);
+                            d3.selectAll('.maxLabel'+lg._selectedBar+'id'+_parent._idnum).attr("opacity",1);
+                            d3.selectAll('.sortLabel'+lg._selectedBar+'id'+_parent._idnum).style("font-weight","bold");
                             lg.mapRegister.colorMap(dataSubset,v);
                         };
                     });
 
-                d3.selectAll('.selectbars'+i).on('mouseover.something', tips[i].show).on('mouseout.something', tips[i].hide);
+                d3.selectAll('.selectbars'+i+'id'+_parent._idnum).on('mouseover.something', tips[i].show).on('mouseout.something', tips[i].hide);
                 d3.selectAll('.sortLabel').on('mouseover.something', tipsort.show).on('mouseout.something', tipsort.hide);         
                                                        
             })
@@ -628,7 +663,7 @@ var lg =  {
                 .attr("x2", _parent._properties.width-_parent._hWhiteSpace)
                 .attr("y2", function(d,i){return _parent._properties.boxHeight*(i)+(i-0.5)*_parent._vWhiteSpace})
                 .attr("opacity",0)
-                .attr("class",function(d,i){return "horLine"+i+" horLineTop"})
+                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineTop"})
                 .attr("stroke-width", 1)
                 .attr("stroke", "#ddd");
 
@@ -643,7 +678,7 @@ var lg =  {
                 .attr("x2", _parent._properties.width-_parent._hWhiteSpace)
                 .attr("y2", function(d,i){return _parent._properties.boxHeight*(i+1)+(i+0.5)*_parent._vWhiteSpace})
                 .attr("opacity",0)
-                .attr("class",function(d,i){return "horLine"+i+" horLineBot"})
+                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineBot"})
                 .attr("stroke-width", 1)
                 .attr("stroke", "#ddd");
 
@@ -696,14 +731,14 @@ var lg =  {
                     newData.push(nd);
                 });
 
-                d3.selectAll(".bars"+i)
+                d3.selectAll(".bars"+i+'id'+_parent._idnum)
                     .data(newData)                  
                     .transition()
                     .duration(750)
                     .attr("x", function(d,i2){return _parent._properties.boxWidth*i+i*_parent._hWhiteSpace})
                     .attr("y", function(d,i2){return _parent._properties.boxHeight*d.pos+d.pos*_parent._vWhiteSpace});
 
-                d3.selectAll(".selectbars"+i)
+                d3.selectAll(".selectbars"+i+'id'+_parent._idnum)
                     .data(newData)                  
                     .transition()
                     .duration(750)
