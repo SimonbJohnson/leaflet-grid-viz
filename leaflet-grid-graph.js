@@ -120,7 +120,7 @@ var lg =  {
                 
             });
 
-            var map = L.map('map', {
+            var map = L.map(this._id, {
                 center: center,
                 zoom: zoom,
                 layers: [baselayer]
