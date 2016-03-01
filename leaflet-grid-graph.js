@@ -533,7 +533,7 @@ var lg =  {
                     g.append("text")
                         .text(v._labelAccessor(v._domain[v._domain.length-1]))        
                         .attr("x",_parent._properties.boxWidth-5)
-                        .attr("y",_parent._properties.height+_parent._vWhiteSpace)               
+                        .attr("y",_parent._properties.height+10+_parent._vWhiteSpace)               
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
@@ -542,7 +542,7 @@ var lg =  {
                     g.append("text")
                         .text(v._labelAccessor(v._domain[0]))        
                         .attr("x",-5)
-                        .attr("y",_parent._properties.height+_parent._vWhiteSpace)               
+                        .attr("y",_parent._properties.height+10+_parent._vWhiteSpace)               
                         .style("text-anchor", "front")
                         .attr("transform", "translate(" + _xTransform + "," + 0 + ")" )
                         .attr("opacity",0)
@@ -638,7 +638,7 @@ var lg =  {
                 .attr("x2", _parent._properties.width-_parent._hWhiteSpace)
                 .attr("y2", function(d,i){return _parent._properties.boxHeight*(i)+(i-0.5)*_parent._vWhiteSpace})
                 .attr("opacity",0)
-                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineTop"})
+                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineTop horLineTopid"+_parent._idnum})
                 .attr("stroke-width", 1)
                 .attr("stroke", "#ddd");
 
@@ -653,7 +653,7 @@ var lg =  {
                 .attr("x2", _parent._properties.width-_parent._hWhiteSpace)
                 .attr("y2", function(d,i){return _parent._properties.boxHeight*(i+1)+(i+0.5)*_parent._vWhiteSpace})
                 .attr("opacity",0)
-                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineBot"})
+                .attr("class",function(d,i){return "horLine"+i+'id'+_parent._idnum+" horLineBot horLineBotid"+_parent._idnum})
                 .attr("stroke-width", 1)
                 .attr("stroke", "#ddd");
 
@@ -671,7 +671,7 @@ var lg =  {
                 .attr("y", function(d,i) {
                     return _parent._properties.boxHeight*(i+0.5)+i*_parent._vWhiteSpace;
                 })
-                .attr('class','nameLabels');        
+                .attr('class','nameLabels nameLabelsid'+_parent._idnum);        
                     
         }
 
@@ -694,17 +694,15 @@ var lg =  {
                 return a[_parent._nameAttr].localeCompare(b[_parent._nameAttr]);
             });
 
-            columns.forEach(function(v,i){
+            var newData = [];
 
-                var newData = [];
+            data.forEach(function(d,i){
+                var nd = {};
+                nd.pos = d.pos;
+                newData.push(nd);
+            });            
 
-                data.forEach(function(d,i){
-                    var nd = {};
-                    nd.pos = d.pos;
-                    nd.join = d[_parent._joinAttr];
-                    nd.value = d[v._dataName];
-                    newData.push(nd);
-                });
+            columns.forEach(function(v,i){                
 
                 d3.selectAll(".bars"+i+'id'+_parent._idnum)
                     .data(newData)                  
@@ -722,16 +720,16 @@ var lg =  {
 
             });
 
-            d3.selectAll(".horLineTop")
-                .attr("y1",function(d,i){return _parent._properties.boxHeight*(d.pos)+(d.pos-0.5)*_parent._vWhiteSpace})
+            d3.selectAll(".horLineTopid"+_parent._idnum)
+                .attr("y1",function(d,i){console.log('top:'+d.pos);return _parent._properties.boxHeight*(d.pos)+(d.pos-0.5)*_parent._vWhiteSpace})
                 .attr("y2",function(d,i){return _parent._properties.boxHeight*(d.pos)+(d.pos-0.5)*_parent._vWhiteSpace});
 
-            d3.selectAll(".horLineBot")
-                .attr("y1",function(d,i){return _parent._properties.boxHeight*(d.pos+1)+(d.pos+0.5)*_parent._vWhiteSpace})
+            d3.selectAll(".horLineBotid"+_parent._idnum)
+                .attr("y1",function(d,i){console.log('bottom'+d.pos);return _parent._properties.boxHeight*(d.pos+1)+(d.pos+0.5)*_parent._vWhiteSpace})
                 .attr("y2",function(d,i){return _parent._properties.boxHeight*(d.pos+1)+(d.pos+0.5)*_parent._vWhiteSpace});             
 
 
-            d3.selectAll(".nameLabels")             
+            d3.selectAll(".nameLabelsid"+_parent._idnum)             
                 .transition()
                 .duration(750)
                 .attr("y",function(d){
