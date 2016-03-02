@@ -692,17 +692,19 @@ var lg =  {
 
             data.sort(function(a, b) {
                 return a[_parent._nameAttr].localeCompare(b[_parent._nameAttr]);
-            });
+            });         
 
-            var newData = [];
+            columns.forEach(function(v,i){
 
-            data.forEach(function(d,i){
-                var nd = {};
-                nd.pos = d.pos;
-                newData.push(nd);
-            });            
+                var newData = [];
 
-            columns.forEach(function(v,i){                
+                data.forEach(function(d,i){               
+                     var nd = {};      
+                     nd.pos = d.pos;       
+                     nd.join = d[_parent._joinAttr];       
+                     nd.value = d[v._dataName];        
+                     newData.push(nd);     
+                });
 
                 d3.selectAll(".bars"+i+'id'+_parent._idnum)
                     .data(newData)                  
