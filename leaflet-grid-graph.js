@@ -147,9 +147,35 @@ var lg =  {
 
             return map;
 
+			function isDate(myDate) {
+				return myDate.constructor.toString().indexOf("Date") > -1;
+			}
+			function formatDate(d) {
+				if (Number(d)!=0){
+					var year = d.getFullYear();
+					var month = d.getMonth() + 1;
+					var day = d.getDate();
+					return day+'/'+month+'/'+year;
+				} else {
+					return 'Invalid data';
+				}
+			};
+				
             function onEachFeature(feature, layer) {
+				var formatComma = d3.format(",.0f");
                 layer.on("mouseover",function(f,l){
-                    _parent._info.update(f.target.feature.properties[_parent._nameAttr] + ' - ' + findCurrentData(f.target.feature.properties[_parent._joinAttr]));
+					columnName = _parent._currentColumn;
+					dataValue = findCurrentData(f.target.feature.properties[_parent._joinAttr]);
+					if (dataValue==null) {
+						dataValue = 'No data';
+					} else if (isDate(dataValue)) {
+						dataValue = formatDate(dataValue);
+					} else if (!isNaN(dataValue)){
+						dataValue = formatComma(dataValue);
+					};
+					console.log(dataValue);
+                    _parent._info.update(f.target.feature.properties[_parent._nameAttr] + ' - ' + dataValue, columnName);
+					_parent._onHover(f.target.feature);
                 });
 
                 layer.on("mouseout",function(f,l){
